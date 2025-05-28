@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"github.com/Dylan-Oleary/cachigo/cmd/cli"
+)
 
 func main() {
-	fmt.Println("Hello Cachigo")
+	c := cli.Init()
+	c.Run()
 }
