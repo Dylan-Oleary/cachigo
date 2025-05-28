@@ -1,41 +1,38 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
-
-	prompt "github.com/c-bata/go-prompt"
 )
 
-func Init() *prompt.Prompt {
-	p := prompt.New(executor, completer)
+func Init() {
+	fmt.Println("MyCLI started. Type 'help' for commands. Type 'exit' to quit.")
 
-	return p
-}
+	reader := bufio.NewReader(os.Stdin)
 
-func executor(in string) {
-	in = strings.TrimSpace(in)
-	args := strings.Split(in, " ")
+	for {
+		fmt.Print("> ")
+		input, _ := reader.ReadString('\n')
+		input = strings.ReplaceAll(input, "\r", "")
+		input = strings.TrimSpace(input)
+		args := strings.Split(input, " ")
 
-	switch args[0] {
-	case "exit":
-		fmt.Println("Bye!")
-		os.Exit(0)
-	case "echo":
-		fmt.Println(strings.Join(args[1:], " "))
-	case "help":
-		fmt.Println("Commands: help, echo, exit")
-	default:
-		fmt.Printf("Unknown command: %s\n", args[0])
+		if len(args) == 0 {
+			continue
+		}
+
+		switch args[0] {
+		case "exit":
+			fmt.Println("Bye!")
+			return
+		case "help":
+			fmt.Println("Available commands: help, echo, exit")
+		case "echo":
+			fmt.Println(strings.Join(args[1:], " "))
+		default:
+			fmt.Printf("Unknown command: %s\n", args[0])
+		}
 	}
-}
-
-func completer(d prompt.Document) []prompt.Suggest {
-	s := []prompt.Suggest{
-		{Text: "help", Description: "Show help"},
-		{Text: "echo", Description: "Echo input"},
-		{Text: "exit", Description: "Exit the CLI"},
-	}
-	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
 }
