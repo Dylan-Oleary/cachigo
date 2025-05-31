@@ -36,6 +36,7 @@ func Init() {
 			return
 		case "help":
 			fmt.Println("Available commands: help, echo, exit")
+			continue
 		case "get":
 			v, err := store.Get(args[1])
 
@@ -45,6 +46,7 @@ func Init() {
 			}
 
 			fmt.Printf("%s\n", v)
+			continue
 		case "list":
 			fmt.Print("\n")
 
@@ -69,8 +71,10 @@ func Init() {
 			continue
 		case "echo":
 			fmt.Println(strings.Join(args[1:], " "))
+			continue
 		default:
 			fmt.Printf("Unknown command: %s\n", args[0])
+			continue
 		}
 	}
 }
