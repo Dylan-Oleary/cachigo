@@ -45,7 +45,22 @@ func Init() {
 			}
 
 			fmt.Printf("%s\n", v)
+		case "list":
+			fmt.Print("\n")
+
+			for _, k := range store.ListKeys() {
+				fmt.Println(k)
+			}
+			continue
+		case "remove":
+			store.Remove(args[1])
+			continue
 		case "set":
+			if len(args) != 3 {
+				fmt.Println("Invalid args provided")
+				continue
+			}
+
 			_, err := store.Set(args[1], args[2])
 
 			if err != nil {

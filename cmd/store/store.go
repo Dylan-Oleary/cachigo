@@ -2,7 +2,9 @@ package store
 
 type Store interface {
 	get(key string) (string, error)
+	listKeys() ([]string, error)
 	set(key string, value string) (bool, error)
+	remove(key string)
 }
 
 type cache struct {
@@ -25,6 +27,20 @@ func (c *cache) Get(key string) (string, error) {
 	}
 
 	return v, nil
+}
+
+func (c *cache) ListKeys() []string {
+	keys := make([]string, 0, len(c.data))
+
+	for k := range c.data {
+		keys = append(keys, k)
+	}
+
+	return keys
+}
+
+func (c *cache) Remove(key string) {
+	delete(c.data, key)
 }
 
 func (c *cache) Set(key string, value string) (bool, error) {
