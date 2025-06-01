@@ -3,13 +3,15 @@ package cli
 import (
 	"bufio"
 	"fmt"
+	"net"
 	"os"
 	"strings"
 
 	"github.com/Dylan-Oleary/cachigo/cmd/store"
+	tcp "github.com/Dylan-Oleary/cachigo/tcp/client"
 )
 
-func Init() {
+func Init(conn net.Conn) {
 	store := store.InitCache()
 	reader := bufio.NewReader(os.Stdin)
 
@@ -31,6 +33,9 @@ func Init() {
 		}
 
 		switch args[0] {
+		case "echo":
+			fmt.Println(strings.Join(args[1:], " "))
+			continue
 		case "exit":
 			fmt.Println("Bye!")
 			return
@@ -69,8 +74,14 @@ func Init() {
 				fmt.Println("Error", err)
 			}
 			continue
-		case "echo":
-			fmt.Println(strings.Join(args[1:], " "))
+		case "tcp":
+			res, err := tcp.SendRequest(conn, &tcp.GetRequest{Command: args[1]})
+
+			if err != nil {
+				fmt.Println("Error", err)
+			}
+
+			fmt.Println("Response:", res)
 			continue
 		default:
 			fmt.Printf("Unknown command: %s\n", args[0])
