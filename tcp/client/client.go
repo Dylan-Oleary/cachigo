@@ -6,8 +6,14 @@ import (
 	"net"
 )
 
-type GetRequest struct {
+type RequestData struct {
 	Command string `json:"command"`
+	Key     string `json:"key"`
+	Value   string `json:"value"`
+}
+
+type Request struct {
+	Data RequestData `json:"data"`
 }
 
 type Response struct {
@@ -26,7 +32,7 @@ func GetClient(addr string) (net.Conn, error) {
 	return conn, nil
 }
 
-func SendRequest(conn net.Conn, req *GetRequest) (*Response, error) {
+func SendRequest(conn net.Conn, req *Request) (*Response, error) {
 	payload, err := json.Marshal(req)
 
 	if err != nil {

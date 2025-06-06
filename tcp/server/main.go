@@ -7,25 +7,20 @@ import (
 	"os"
 
 	tcp "github.com/Dylan-Oleary/cachigo/tcp/client"
+	requests "github.com/Dylan-Oleary/cachigo/tcp/requests"
 )
 
 var host = "localhost:8080"
-
-// Next Steps
-//// CLI -> TCP Client
-//// TCP Client (Multiple) -> One TCP Server
-//// Concurrency/MutEx/Profit?
 
 func main() {
 	ln, err := net.Listen("tcp", host)
 
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("Failed to start server:", err)
 		os.Exit(1)
 	}
 
 	defer ln.Close()
-
 	fmt.Printf("Server listening on %s\n", host)
 
 	for {
@@ -51,20 +46,24 @@ func handleConnection(c net.Conn) {
 			break
 		}
 
-		data := tcp.GetRequest{}
-		err = json.Unmarshal(buffer[:size], &data)
+		req := tcp.Request{}
+		err = json.Unmarshal(buffer[:size], &req)
 
 		if err != nil {
 			fmt.Println("Invalid payload passed", err)
 			continue
 		}
 
-		res := tcp.Response{Success: true, Message: "Your command was" + data.Command}
+		res := tcp.Response{}
+		requests.HandleRequest(&req, &res)
+
 		b, err := json.Marshal(res)
 
 		if err != nil {
 			fmt.Println("Failed to encode response", err)
-			continue
+			res.Message = err.Error()
+			res.Success = false
+			break
 		}
 
 		c.Write(b)

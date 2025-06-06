@@ -12,7 +12,7 @@ import (
 )
 
 func Init(conn net.Conn) {
-	store := store.InitCache()
+	store := store.GetCache()
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
@@ -43,14 +43,14 @@ func Init(conn net.Conn) {
 			fmt.Println("Available commands: help, echo, exit")
 			continue
 		case "get":
-			v, err := store.Get(args[1])
+			res, err := tcp.SendRequest(conn, &tcp.Request{Data: tcp.RequestData{Command: "get", Key: args[1]}})
 
 			if err != nil {
 				fmt.Println("Error", err)
 				continue
 			}
 
-			fmt.Printf("%s\n", v)
+			fmt.Printf("%s\n", res.Message)
 			continue
 		case "list":
 			fmt.Print("\n")
@@ -68,20 +68,14 @@ func Init(conn net.Conn) {
 				continue
 			}
 
-			_, err := store.Set(args[1], args[2])
+			res, err := tcp.SendRequest(conn, &tcp.Request{Data: tcp.RequestData{Command: "set", Key: args[1], Value: args[2]}})
 
 			if err != nil {
-				fmt.Println("Error", err)
-			}
-			continue
-		case "tcp":
-			res, err := tcp.SendRequest(conn, &tcp.GetRequest{Command: args[1]})
-
-			if err != nil {
-				fmt.Println("Error", err)
+				fmt.Println("Error:", err)
+				continue
 			}
 
-			fmt.Println("Response:", res)
+			fmt.Println("Outcome:", res.Success)
 			continue
 		default:
 			fmt.Printf("Unknown command: %s\n", args[0])
