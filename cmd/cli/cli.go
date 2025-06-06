@@ -3,14 +3,16 @@ package cli
 import (
 	"bufio"
 	"fmt"
+	"net"
 	"os"
 	"strings"
 
 	"github.com/Dylan-Oleary/cachigo/cmd/store"
+	tcp "github.com/Dylan-Oleary/cachigo/tcp/client"
 )
 
-func Init() {
-	store := store.InitCache()
+func Init(conn net.Conn) {
+	store := store.GetCache()
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
@@ -31,6 +33,9 @@ func Init() {
 		}
 
 		switch args[0] {
+		case "echo":
+			fmt.Println(strings.Join(args[1:], " "))
+			continue
 		case "exit":
 			fmt.Println("Bye!")
 			return
@@ -38,14 +43,14 @@ func Init() {
 			fmt.Println("Available commands: help, echo, exit")
 			continue
 		case "get":
-			v, err := store.Get(args[1])
+			res, err := tcp.SendRequest(conn, &tcp.Request{Data: tcp.RequestData{Command: "get", Key: args[1]}})
 
 			if err != nil {
 				fmt.Println("Error", err)
 				continue
 			}
 
-			fmt.Printf("%s\n", v)
+			fmt.Printf("%s\n", res.Message)
 			continue
 		case "list":
 			fmt.Print("\n")
@@ -63,14 +68,14 @@ func Init() {
 				continue
 			}
 
-			_, err := store.Set(args[1], args[2])
+			res, err := tcp.SendRequest(conn, &tcp.Request{Data: tcp.RequestData{Command: "set", Key: args[1], Value: args[2]}})
 
 			if err != nil {
-				fmt.Println("Error", err)
+				fmt.Println("Error:", err)
+				continue
 			}
-			continue
-		case "echo":
-			fmt.Println(strings.Join(args[1:], " "))
+
+			fmt.Println("Outcome:", res.Success)
 			continue
 		default:
 			fmt.Printf("Unknown command: %s\n", args[0])
