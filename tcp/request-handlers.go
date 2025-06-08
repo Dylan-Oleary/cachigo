@@ -10,6 +10,10 @@ func HandleRequest(req *Request, res *Response) *Response {
 	c := store.GetCache()
 
 	switch req.Data.Command {
+	case "del":
+		c.Remove(req.Data.Key)
+		res.Success = true
+		res.Message = "Success"
 	case "get":
 		v, err := c.Get(req.Data.Key)
 
@@ -19,6 +23,12 @@ func HandleRequest(req *Request, res *Response) *Response {
 
 		res.Success = true
 		res.Message = v
+	case "keys":
+		for _, k := range c.ListKeys() {
+			res.Message += k + "\n"
+		}
+
+		res.Success = true
 	case "set":
 		v, err := c.Set(req.Data.Key, req.Data.Value)
 

@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Dylan-Oleary/cachigo/store"
 	"github.com/Dylan-Oleary/cachigo/tcp"
 )
 
@@ -18,7 +17,6 @@ func main() {
 	}
 	defer conn.Close()
 
-	store := store.GetCache()
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
@@ -58,15 +56,25 @@ func main() {
 
 			fmt.Printf("%s\n", res.Message)
 			continue
-		case "list":
-			fmt.Print("\n")
+		case "keys":
+			res, err := tcp.SendRequest(conn, &tcp.Request{Data: tcp.RequestData{Command: "keys"}})
 
-			for _, k := range store.ListKeys() {
-				fmt.Println(k)
+			if err != nil {
+				fmt.Println("Error", err)
+				continue
 			}
+
+			fmt.Printf("%s\n", res.Message)
 			continue
-		case "remove":
-			store.Remove(args[1])
+		case "del":
+			res, err := tcp.SendRequest(conn, &tcp.Request{Data: tcp.RequestData{Command: "del", Key: args[1]}})
+
+			if err != nil {
+				fmt.Println("Error", err)
+				continue
+			}
+
+			fmt.Printf("%s\n", res.Message)
 			continue
 		case "set":
 			if len(args) != 3 {
