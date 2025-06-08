@@ -15,7 +15,7 @@ var c = cache{
 	data: make(map[string]string),
 }
 
-func InitCache() *cache {
+func GetCache() *cache {
 	return &c
 }
 
