@@ -1,17 +1,23 @@
-package cli
+package main
 
 import (
 	"bufio"
 	"fmt"
-	"net"
 	"os"
 	"strings"
 
-	"github.com/Dylan-Oleary/cachigo/cmd/store"
-	tcp "github.com/Dylan-Oleary/cachigo/tcp/client"
+	"github.com/Dylan-Oleary/cachigo/store"
+	"github.com/Dylan-Oleary/cachigo/tcp"
 )
 
-func Init(conn net.Conn) {
+func main() {
+	conn, err := tcp.GetClient("localhost:8080")
+
+	if err != nil {
+		os.Exit(1)
+	}
+	defer conn.Close()
+
 	store := store.GetCache()
 	reader := bufio.NewReader(os.Stdin)
 

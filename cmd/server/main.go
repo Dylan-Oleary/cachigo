@@ -6,8 +6,7 @@ import (
 	"net"
 	"os"
 
-	tcp "github.com/Dylan-Oleary/cachigo/tcp/client"
-	requests "github.com/Dylan-Oleary/cachigo/tcp/requests"
+	"github.com/Dylan-Oleary/cachigo/tcp"
 )
 
 var host = "localhost:8080"
@@ -55,7 +54,7 @@ func handleConnection(c net.Conn) {
 		}
 
 		res := tcp.Response{}
-		requests.HandleRequest(&req, &res)
+		tcp.HandleRequest(&req, &res)
 
 		b, err := json.Marshal(res)
 

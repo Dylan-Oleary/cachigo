@@ -3,11 +3,10 @@ package tcp
 import (
 	"fmt"
 
-	"github.com/Dylan-Oleary/cachigo/cmd/store"
-	tcp "github.com/Dylan-Oleary/cachigo/tcp/client"
+	"github.com/Dylan-Oleary/cachigo/store"
 )
 
-func HandleRequest(req *tcp.Request, res *tcp.Response) *tcp.Response {
+func HandleRequest(req *Request, res *Response) *Response {
 	c := store.GetCache()
 
 	switch req.Data.Command {
@@ -37,7 +36,7 @@ func HandleRequest(req *tcp.Request, res *tcp.Response) *tcp.Response {
 	return res
 }
 
-func handleRequestError(res *tcp.Response, err error) *tcp.Response {
+func handleRequestError(res *Response, err error) *Response {
 	fmt.Println("Error:", err)
 
 	res.Success = false
