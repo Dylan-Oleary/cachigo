@@ -46,31 +46,35 @@ func main() {
 		case "help":
 			fmt.Println("Available commands: help, echo, exit")
 			continue
-		case "get":
-			res, err := tcp.SendRequest(conn, &tcp.Request{Data: tcp.RequestData{Command: "get", Key: args[1]}})
+		case "del", "get":
+			if len(args) != 2 {
+				fmt.Println("Error: Invalid number of arguments passed")
+				continue
+			}
+
+			data := tcp.RequestData{Command: args[0], Key: args[1]}
+			req := tcp.Request{Data: data}
+			res, err := tcp.SendRequest(conn, &req)
 
 			if err != nil {
-				fmt.Println("Error", err)
+				fmt.Println("Error:", err)
 				continue
 			}
 
 			fmt.Printf("%s\n", res.Message)
 			continue
 		case "keys":
-			res, err := tcp.SendRequest(conn, &tcp.Request{Data: tcp.RequestData{Command: "keys"}})
-
-			if err != nil {
-				fmt.Println("Error", err)
+			if len(args) != 1 {
+				fmt.Println("Error: Invalid number of arguments passed")
 				continue
 			}
 
-			fmt.Printf("%s\n", res.Message)
-			continue
-		case "del":
-			res, err := tcp.SendRequest(conn, &tcp.Request{Data: tcp.RequestData{Command: "del", Key: args[1]}})
+			data := tcp.RequestData{Command: args[0]}
+			req := tcp.Request{Data: data}
+			res, err := tcp.SendRequest(conn, &req)
 
 			if err != nil {
-				fmt.Println("Error", err)
+				fmt.Println("Error:", err)
 				continue
 			}
 
@@ -78,18 +82,20 @@ func main() {
 			continue
 		case "set":
 			if len(args) != 3 {
-				fmt.Println("Invalid args provided")
+				fmt.Println("Error: Invalid number of arguments passed")
 				continue
 			}
 
-			res, err := tcp.SendRequest(conn, &tcp.Request{Data: tcp.RequestData{Command: "set", Key: args[1], Value: args[2]}})
+			data := tcp.RequestData{Command: args[0], Key: args[1], Value: args[2]}
+			req := tcp.Request{Data: data}
+			res, err := tcp.SendRequest(conn, &req)
 
 			if err != nil {
 				fmt.Println("Error:", err)
 				continue
 			}
 
-			fmt.Println("Outcome:", res.Success)
+			fmt.Printf("%s\n", res.Message)
 			continue
 		default:
 			fmt.Printf("Unknown command: %s\n", args[0])
