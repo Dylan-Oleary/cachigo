@@ -79,7 +79,7 @@ func (c *cache) Set(key string, value string) (bool, error) {
 }
 
 func InitPersistence() error {
-	filePath := "./data/logs.txt"
+	filePath := "./cmd_logs.txt"
 
 	_, err := os.Lstat(filePath)
 	if err != nil {

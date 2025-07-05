@@ -27,5 +27,5 @@ go.work.sum
 # build
 bin
 
-# data
-data
+# logs
+cmd_logs.txt
