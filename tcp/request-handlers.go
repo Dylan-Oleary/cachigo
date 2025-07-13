@@ -11,7 +11,7 @@ func HandleRequest(req *Request, res *Response) *Response {
 
 	switch req.Data.Command {
 	case "del":
-		c.Remove(req.Data.Key)
+		c.Remove(req.Data.Key, true)
 		res.Success = true
 		res.Message = "Success"
 	case "get":
@@ -30,7 +30,7 @@ func HandleRequest(req *Request, res *Response) *Response {
 
 		res.Success = true
 	case "set":
-		v, err := c.Set(req.Data.Key, req.Data.Value)
+		v, err := c.Set(req.Data.Key, req.Data.Value, true)
 
 		if err != nil {
 			return handleRequestError(res, err)
