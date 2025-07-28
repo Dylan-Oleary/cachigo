@@ -6,12 +6,18 @@ import (
 	"net"
 	"os"
 
+	"github.com/Dylan-Oleary/cachigo/store"
 	"github.com/Dylan-Oleary/cachigo/tcp"
 )
 
 var host = "localhost:8080"
 
 func main() {
+	err := store.InitPersistence()
+	if err != nil {
+		os.Exit(1)
+	}
+
 	ln, err := net.Listen("tcp", host)
 
 	if err != nil {
