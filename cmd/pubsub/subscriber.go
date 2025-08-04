@@ -20,7 +20,6 @@ func ConsumeMessage(msg BrokerMessage) error {
 	}
 
 	for _, c := range conns {
-		fmt.Print("Looping conns for topic", msg.topic)
 		c.Write([]byte(msg.payload))
 	}
 
