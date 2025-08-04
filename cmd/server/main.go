@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 
+	"github.com/Dylan-Oleary/cachigo/cmd/pubsub"
 	"github.com/Dylan-Oleary/cachigo/store"
 	"github.com/Dylan-Oleary/cachigo/tcp"
 )
@@ -27,6 +28,8 @@ func main() {
 
 	defer ln.Close()
 	fmt.Printf("Server listening on %s\n", host)
+
+	go initMessageBroker()
 
 	for {
 		c, err := ln.Accept()
@@ -60,7 +63,7 @@ func handleConnection(c net.Conn) {
 		}
 
 		res := tcp.Response{}
-		tcp.HandleRequest(&req, &res)
+		tcp.HandleRequest(&req, &res, c)
 
 		b, err := json.Marshal(res)
 
@@ -73,4 +76,8 @@ func handleConnection(c net.Conn) {
 
 		c.Write(b)
 	}
+}
+
+func initMessageBroker() {
+	pubsub.StartMessageBroker()
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/Dylan-Oleary/cachigo/tcp"
 )
@@ -80,7 +81,7 @@ func main() {
 
 			fmt.Printf("%s\n", res.Message)
 			continue
-		case "set":
+		case "pub", "set":
 			if len(args) != 3 {
 				fmt.Println("Error: Invalid number of arguments passed")
 				continue
@@ -97,6 +98,38 @@ func main() {
 
 			fmt.Printf("%s\n", res.Message)
 			continue
+		case "sub":
+			if len(args) != 2 {
+				fmt.Println("Error: Invalid number of arguments passed")
+				continue
+			}
+
+			data := tcp.RequestData{Command: args[0], Key: args[1]}
+			req := tcp.Request{Data: data}
+			_, err := tcp.SendRequest(conn, &req)
+
+			if err != nil {
+				fmt.Println("Error:", err)
+				continue
+			}
+
+			var wg sync.WaitGroup
+
+			wg.Add(1)
+
+			go func() {
+				for {
+					msg := make([]byte, 1024)
+					n, err := conn.Read(msg)
+					if err != nil {
+						fmt.Println("Error reading connection message")
+						break
+					}
+					fmt.Printf("%s\n", string(msg[:n]))
+				}
+			}()
+
+			wg.Wait()
 		default:
 			fmt.Printf("Unknown command: %s\n", args[0])
 			continue
